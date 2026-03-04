@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共和CIO · 枢轴点看板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #F2F2F7;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #E5E5EA;
+            --text-primary: #1C1C1E;
+            --text-secondary: #8E8E93;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-red: #FF3B30;
+            --accent-orange: #FF9500;
+            --accent-purple: #AF52DE;
+            --border-radius: 12px;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+        
+        /* 导航栏 */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 12px 16px;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .nav-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 16px 24px;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 0.5px solid var(--bg-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* 新闻列表 */
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .news-item {
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 10px;
+            border-left: 3px solid var(--accent-blue);
+        }
+        
+        .news-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .news-impact {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .news-item.hot {
+            border-left-color: var(--accent-red);
+        }
+        
+        .news-item.policy {
+            border-left-color: var(--accent-orange);
+        }
+        
+        /* 数据表格 */
+        .data-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .data-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .data-table th {
+            background: var(--bg-primary);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        
+        .data-table th.center {
+            text-align: center;
+        }
+        
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 0.5px solid var(--bg-tertiary);
+            white-space: nowrap;
+        }
+        
+        .data-table td.center {
+            text-align: center;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* 涨跌颜色 */
+        .up {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+        
+        .down {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+        
+        /* 板块标签 */
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .tag-up {
+            background: rgba(255,59,48,0.12);
+            color: var(--accent-red);
+        }
+        
+        .tag-down {
+            background: rgba(52,199,89,0.12);
+            color: var(--accent-green);
+        }
+        
+        .tag-neutral {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        /* 预测板块 */
+        .prediction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .prediction-card {
+            background: var(--bg-primary);
+            border-radius: 10px;
+            padding: 16px;
+        }
+        
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .prediction-sector {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .prediction-reason {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* 风险提示 */
+        .risk-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .risk-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(255,59,48,0.06);
+            border-radius: 10px;
+        }
+        
+        .risk-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .risk-text {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* 枢轴点表格特殊样式 */
+        .pivot-table td:first-child {
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .pivot-r1 { color: var(--accent-red); }
+        .pivot-s1 { color: var(--accent-green); }
+        .pivot-pp { color: var(--accent-blue); font-weight: 700; }
+        
+        /* 策略建议标签 */
+        .strategy-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .strategy-long {
+            background: rgba(255,59,48,0.12);
+            color: var(--accent-red);
+        }
+        
+        .strategy-short {
+            background: rgba(52,199,89,0.12);
+            color: var(--accent-green);
+        }
+        
+        .strategy-watch {
+            background: rgba(175,82,222,0.12);
+            color: var(--accent-purple);
+        }
+        
+        /* 简介文本 */
+        .intro-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        /* 滚动提示 */
+        .scroll-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 8px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 76px 12px 20px;
+            }
+            
+            .card-header {
+                padding: 14px 16px;
+            }
+            
+            .card-body {
+                padding: 16px;
+            }
+            
+            .prediction-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .news-item {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav">
+        <div class="nav-content">
+            <div class="nav-title">共和CIO · 枢轴点看板</div>
+            <div class="nav-date">2026年3月4日 星期三</div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 国际热点追踪 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">一、国际热点追踪</div>
+            </div>
+            <div class="card-body">
+                <div class="news-list">
+                    <div class="news-item hot">
+                        <div class="news-title">美伊冲突急剧升级，特朗普誓言"不惜一切"</div>
+                        <div class="news-impact">美国、以色列对伊朗发动军事打击，伊朗最高领袖选举机构办公楼被炸。特朗普表示在伊朗问题上将"不惜代价"，市场恐慌情绪蔓延。影响逻辑：地缘政治风险推升避险需求，但冲突导致全球能源供应紧张，通胀预期回升，压制风险资产估值。</div>
+                    </div>
+                    <div class="news-item hot">
+                        <div class="news-title">霍尔木兹海峡面临关闭，油价暴涨</div>
+                        <div class="news-impact">布伦特原油突破84美元/桶（+8%），WTI跃升至77美元以上。沙特阿美拟改走红海口岸自救，卡塔尔能源扩大停产范围。影响逻辑：全球约20%石油运输经霍尔木兹海峡，若关闭将引发能源危机，利好油气板块，冲击航运成本和制造业利润。</div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">全球市场遭遇"黑色星期二"，美股重挫</div>
+                        <div class="news-impact">道指一度跌超1200点，纳指跌1.37%，标普500跌1.25%；VIX波动率指数突破25，创去年11月以来新高。影响逻辑：能源价格上涨引发滞胀担忧，美联储降息预期大幅减弱，首次降息定价已推迟至9月，高估值科技股承压。</div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">黄金价格高位回调，失守5000美元关口</div>
+                        <div class="news-impact">现货黄金从5418美元历史高点回落，最低触及4996美元，跌幅约4%。影响逻辑：此前地缘溢价过高，短期获利盘涌出；同时美元反弹压制金价，但中长期央行购金和去美元化趋势未改，回调提供布局机会。</div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">欧股集体重挫，德法股市跌超3%</div>
+                        <div class="news-impact">德国DAX30跌3.44%，法国CAC40跌3.46%，英国富时100跌2.75%。影响逻辑：欧洲能源依赖度高，中东冲突对其冲击更大；叠加特朗普关税威胁，全球贸易不确定性上升，出口导向型经济体受冲击。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 国内热点追踪 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">二、国内热点追踪</div>
+            </div>
+            <div class="card-body">
+                <div class="news-list">
+                    <div class="news-item policy">
+                        <div class="news-title">全国两会今日开幕，政策预期升温</div>
+                        <div class="news-impact">全国政协十四届四次会议于3月4日召开，全国人大四次会议于3月5日召开。政府工作报告将明确GDP增速、赤字率、专项债额度等核心指标。影响逻辑：历史数据显示两会后一个月A股上涨概率高，关注"十五五"规划、新质生产力、扩大内需等政策方向。</div>
+                    </div>
+                    <div class="news-item policy">
+                        <div class="news-title">央行下调外汇风险准备金率至0</div>
+                        <div class="news-impact">央行自3月2日起将远期售汇业务外汇风险准备金率从20%下调至0。影响逻辑：释放稳定汇率信号，降低企业套保成本，支持外贸出口；显示央行对人民币汇率的信心，有利于跨境资金流动稳定。</div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">"三桶油"历史首次集体涨停</div>
+                        <div class="news-impact">中国石油、中国石化、中国海油股价集体涨停，为历史首次。港股通净买入创单周新高749亿港元。影响逻辑：油价暴涨直接利好上游油气企业盈利；高股息防御属性在市场波动期受资金青睐；国企改革估值重塑逻辑延续。</div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">半导体、军工板块大幅回调</div>
+                        <div class="news-impact">半导体产业链持续走弱，稀土永磁概念集体下挫，军工板块震荡调整。科创50跌幅居前。影响逻辑：前期涨幅过大后技术性回调；部分资金获利了结转战油气、银行等低估值板块；短期风格切换迹象明显。</div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title">2月制造业PMI重回扩张区间</div>
+                        <div class="news-impact">中国2月官方制造业PMI 50.2%，比上月上升1.1个百分点，重回荣枯线以上。影响逻辑：经济开门红态势确立，基本面改善为A股提供支撑；关注两会后政策落地对经济修复的进一步验证。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心数据表现 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">三、核心数据表现</div>
+            </div>
+            <div class="card-body">
+                <p class="intro-text">3月3日，A股三大指数集体收跌。沪指盘中创近10年新高后回落，深成指跌超3%，创业板指跌超2%。沪深两市成交额3.13万亿元，较上一交易日放量1088亿。全市场超4800只个股下跌。</p>
+                
+                <div class="scroll-hint">👈 左右滑动查看完整数据</div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>指数</th>
+                                <th>最新点位</th>
+                                <th>涨跌幅</th>
+                                <th>成交额</th>
+                                <th>涨跌家数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>上证指数</strong></td>
+                                <td>4122.68</td>
+                                <td class="down">-1.43%</td>
+                                <td>1.426万亿</td>
+                                <td>涨294 / 跌2039</td>
+                            </tr>
+                            <tr>
+                                <td><strong>深证成指</strong></td>
+                                <td>14022.39</td>
+                                <td class="down">-3.07%</td>
+                                <td>1.704万亿</td>
+                                <td>涨265 / 跌2636</td>
+                            </tr>
+                            <tr>
+                                <td><strong>创业板指</strong></td>
+                                <td>—</td>
+                                <td class="down">-2.57%</td>
+                                <td>7572亿</td>
+                                <td>—</td>
+                            </tr>
+                            <tr>
+                                <td><strong>科创50</strong></td>
+                                <td>—</td>
+                                <td class="down">-2.0%+</td>
+                                <td>—</td>
+                                <td>—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <p style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">板块涨跌幅排名TOP3</p>
+                    <div class="scroll-hint">👈 左右滑动查看完整数据</div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>领涨板块</th>
+                                    <th>涨幅</th>
+                                    <th>驱动因素</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="center">1</td>
+                                    <td>油气开采及服务</td>
+                                    <td class="up">+10%+</td>
+                                    <td>美伊冲突推升油价，三桶油集体涨停</td>
+                                </tr>
+                                <tr>
+                                    <td class="center">2</td>
+                                    <td>港口航运</td>
+                                    <td class="up">+6%+</td>
+                                    <td>VLCC日租金突破42万美元/天，创6年新高</td>
+                                </tr>
+                                <tr>
+                                    <td class="center">3</td>
+                                    <td>化工/化肥</td>
+                                    <td class="up">+4%+</td>
+                                    <td>能源涨价传导，卡塔尔停产推升化工品价格</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 16px;">
+                        <div class="scroll-hint">👈 左右滑动查看完整数据</div>
+                        <div class="data-table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>排名</th>
+                                        <th>领跌板块</th>
+                                        <th>跌幅</th>
+                                        <th>驱动因素</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="center">1</td>
+                                        <td>半导体</td>
+                                        <td class="down">-4%+</td>
+                                        <td>前期涨幅过大，资金获利了结</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="center">2</td>
+                                        <td>军工装备</td>
+                                        <td class="down">-3%+</td>
+                                        <td>题材炒作降温，估值回归</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="center">3</td>
+                                        <td>稀土永磁</td>
+                                        <td class="down">-3%+</td>
+                                        <td>贸易预期波动，供给端扰动</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <p style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">亮点个股</p>
+                    <div class="scroll-hint">👈 左右滑动查看完整数据</div>
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>个股</th>
+                                    <th>涨跌幅</th>
+                                    <th>上涨逻辑</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>中国石油</strong></td>
+                                    <td class="up">+10.04%</td>
+                                    <td>油价暴涨直接受益，三桶油集体涨停创历史</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>招商南油</strong></td>
+                                    <td class="up">+10.02%</td>
+                                    <td>油运市场火爆，VLCC租金创6年新高</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>大众公用</strong></td>
+                                    <td class="up">+10.03%</td>
+                                    <td>燃气+半导体双轮驱动，受益能源涨价</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今日重点板块预测 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">四、今日重点板块预测</div>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: 20px;">
+                    <p style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">预测逻辑框架</p>
+                    <p class="intro-text">
+                        <strong>政策维度：</strong>两会召开，政府工作报告将明确全年经济目标和政策取向。预计财政赤字率目标4%左右，专项债额度提升，"新质生产力"、"扩内需"将成为关键词。<br><br>
+                        <strong>地缘维度：</strong>美伊冲突短期难以平息，油价维持高位运行，能源安全和通胀预期将持续影响市场风格。油气、航运、化工等受益板块或继续强势。<br><br>
+                        <strong>资金维度：</strong>市场风格从成长向价值切换迹象明显，高股息、低估值防御板块受青睐。南向资金持续流入港股，外资对中资股态度转暖。
+                    </p>
+                </div>
+                
+                <p style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">重点关注板块</p>
+                <div class="prediction-grid">
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <span class="prediction-sector">油气开采</span>
+                            <span class="strategy-tag strategy-long">看多</span>
+                        </div>
+                        <p class="prediction-reason">油价维持高位，三桶油业绩弹性大；地缘冲突短期难平息，能源安全主题发酵；高股息属性吸引防御资金。</p>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <span class="prediction-sector">银行/保险</span>
+                            <span class="strategy-tag strategy-long">看多</span>
+                        </div>
+                        <p class="prediction-reason">高股息防御属性凸显；资产质量改善预期；险资入市政策利好；估值处于历史低位。</p>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <span class="prediction-sector">航运港口</span>
+                            <span class="strategy-tag strategy-long">看多</span>
+                        </div>
+                        <p class="prediction-reason">VLCC租金创6年新高；霍尔木兹海峡风险推升运价；油运供需紧平衡格局延续。</p>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <span class="prediction-sector">半导体</span>
+                            <span class="strategy-tag strategy-watch">观望</span>
+                        </div>
+                        <p class="prediction-reason">短期回调后或有反弹机会，但需警惕交易拥挤；关注两会科技创新政策催化；中长期产业趋势未改。</p>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <span class="prediction-sector">国防军工</span>
+                            <span class="strategy-tag strategy-watch">观望</span>
+                        </div>
+                        <p class="prediction-reason">地缘政治虽紧张但板块已提前反应；两会或有军费预算消息催化；短期技术性调整未完。</p>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-header">
+                            <span class="prediction-sector">消费/医药</span>
+                            <span class="strategy-tag strategy-watch">观望</span>
+                        </div>
+                        <p class="prediction-reason">两会扩内需政策预期；避险属性在地缘冲突期受关注；但短期风格不在此，需等待轮动。</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <p style="font-size: 15px; font-weight: 600; margin-bottom: 16px;">风险提示</p>
+                    <div class="risk-list">
+                        <div class="risk-item">
+                            <div class="risk-icon">1</div>
+                            <div class="risk-text">地缘冲突升级超预期，若霍尔木兹海峡完全关闭，可能引发全球能源危机和金融市场剧烈动荡。</div>
+                        </div>
+                        <div class="risk-item">
+                            <div class="risk-icon">2</div>
+                            <div class="risk-text">美联储政策转向鹰派，若通胀因油价上涨而反弹，降息预期进一步推迟将压制全球风险资产估值。</div>
+                        </div>
+                        <div class="risk-item">
+                            <div class="risk-icon">3</div>
+                            <div class="risk-text">两会政策不及预期，若财政刺激力度低于市场预期，可能引发阶段性调整。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心资产枢轴点速查 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">五、核心资产枢轴点速查</div>
+            </div>
+            <div class="card-body">
+                <p class="intro-text">基于经典枢轴点（Pivot Points）计算，提供关键支撑阻力位参考。枢轴点PP = (前高+前低+前收) / 3</p>
+                
+                <div class="scroll-hint">👈 左右滑动查看完整数据</div>
+                <div class="data-table-wrapper">
+                    <table class="data-table pivot-table">
+                        <thead>
+                            <tr>
+                                <th class="center">资产</th>
+                                <th class="center">当前价</th>
+                                <th class="center pivot-r1">R1阻力</th>
+                                <th class="center pivot-pp">PP枢轴</th>
+                                <th class="center pivot-s1">S1支撑</th>
+                                <th class="center">策略建议</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>美元指数</td>
+                                <td>99.13</td>
+                                <td class="pivot-r1">99.50</td>
+                                <td class="pivot-pp">98.36</td>
+                                <td class="pivot-s1">97.50</td>
+                                <td><span class="strategy-tag strategy-long">偏多</span></td>
+                            </tr>
+                            <tr>
+                                <td>现货黄金</td>
+                                <td>5100</td>
+                                <td class="pivot-r1">5380</td>
+                                <td class="pivot-pp">5230</td>
+                                <td class="pivot-s1">4996</td>
+                                <td><span class="strategy-tag strategy-short">回调</span></td>
+                            </tr>
+                            <tr>
+                                <td>上证指数</td>
+                                <td>4122</td>
+                                <td class="pivot-r1">4200</td>
+                                <td class="pivot-pp">4150</td>
+                                <td class="pivot-s1">4050</td>
+                                <td><span class="strategy-tag strategy-watch">震荡</span></td>
+                            </tr>
+                            <tr>
+                                <td>纳斯达克</td>
+                                <td>22437</td>
+                                <td class="pivot-r1">22800</td>
+                                <td class="pivot-pp">22500</td>
+                                <td class="pivot-s1">22000</td>
+                                <td><span class="strategy-tag strategy-short">偏空</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 16px; background: var(--bg-primary); border-radius: 10px;">
+                    <p style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">策略解读</p>
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                        <strong>美元指数：</strong>突破99关口，短期偏多。地缘避险+降息预期减弱双重支撑，关注99.50阻力。<br>
+                        <strong>黄金：</strong>高位回调，短期偏空。地缘溢价过高后获利盘涌出，关注5000美元关口支撑，中长期仍看好。<br>
+                        <strong>上证指数：</strong>震荡格局。两会政策预期托底，但外围波动+风格切换带来震荡，关注4050-4200区间。<br>
+                        <strong>纳斯达克：</strong>短期偏空。科技股估值承压，VIX飙升显示恐慌情绪，关注22000支撑。
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 页脚 -->
+        <div style="text-align: center; padding: 24px; color: var(--text-secondary); font-size: 12px;">
+            <p>共和CIO · 数据驱动决策</p>
+            <p style="margin-top: 4px;">数据来源：AKShare / 新浪财经 / 东方财富 / 汇通财经</p>
+            <p style="margin-top: 4px;">生成时间：2026-03-04 06:30 CST</p>
+        </div>
+    </div>
+</body>
+</html>
