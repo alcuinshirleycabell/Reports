@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全球资产枢轴点矩阵看板 | 2026年3月4日</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #F2F2F7;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #E5E5EA;
+            --text-primary: #1C1C1E;
+            --text-secondary: #8E8E93;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-red: #FF3B30;
+            --accent-orange: #FF9500;
+            --accent-purple: #AF52DE;
+            --border-radius: 12px;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+        
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 12px 16px;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .nav-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 16px 24px;
+        }
+        
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 0.5px solid var(--bg-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-content {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        
+        .section-content p {
+            margin-bottom: 12px;
+        }
+        
+        .highlight {
+            background: rgba(0,122,255,0.1);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-blue);
+            margin: 16px 0;
+        }
+        
+        .data-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .data-table {
+            width: 100%;
+            min-width: 700px;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        .data-table th {
+            background: var(--bg-primary);
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 14px 10px;
+            border-bottom: 0.5px solid var(--bg-tertiary);
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .up {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+        
+        .down {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .tag-up {
+            background: rgba(255,59,48,0.1);
+            color: var(--accent-red);
+        }
+        
+        .tag-down {
+            background: rgba(52,199,89,0.1);
+            color: var(--accent-green);
+        }
+        
+        .tag-neutral {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        .category-header {
+            background: var(--bg-primary);
+            padding: 10px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: left;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 76px 12px 20px;
+            }
+            .card-body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <div class="nav-title">全球资产枢轴点矩阵看板</div>
+            <div class="nav-date">2026年3月4日</div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 全球宏观概述 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🌍 全球宏观概述</div>
+            </div>
+            <div class="card-body">
+                <div class="section-content">
+                    <p><strong>地缘政治风暴席卷全球市场。</strong>美伊冲突急剧升级，美国、以色列对伊朗发动军事打击，伊朗最高领袖选举机构办公楼被炸。特朗普表示在伊朗问题上将"不惜代价"，市场恐慌情绪蔓延。</p>
+                    
+                    <p><strong>全球市场遭遇"黑色星期二"。</strong>道指一度跌超1200点，纳指跌1.37%，标普500跌1.25%；VIX波动率指数突破25，创去年11月以来新高。能源价格上涨引发滞胀担忧，美联储降息预期大幅减弱，首次降息定价已推迟至9月。</p>
+                    
+                    <p><strong>大宗商品剧烈波动。</strong>布伦特原油突破84美元/桶（+8%），WTI跃升至77美元以上。沙特阿美拟改走红海口岸自救，卡塔尔能源扩大停产范围。黄金高位回落跌4%，触发获利回吐，但中期避险逻辑未改。</p>
+                    
+                    <div class="highlight">
+                        🔑 <strong>关键事件窗口：</strong>美伊冲突进展、霍尔木兹海峡通航情况、美联储官员讲话。若冲突进一步升级，可能引发全球能源危机；若外交斡旋见效，风险资产或迎来反弹窗口。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 国内市场概述 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🇨🇳 国内市场概述</div>
+            </div>
+            <div class="card-body">
+                <div class="section-content">
+                    <p><strong>两会开幕，政策预期与市场恐慌交织。</strong>十四届全国人大三次会议开幕，政府工作报告发布。市场关注GDP增长目标、财政赤字率、货币政策基调。政策定调倾向于"稳中求进"，新质生产力、消费提振、房地产平稳过渡为三大主线。</p>
+                    
+                    <p><strong>A股三大指数收跌，结构性行情极端分化。</strong>上证指数跌1.43%，深成指跌超3%，创业板指跌2.57%。但"三桶油"（中石油、中石化、中海油）历史首次集体涨停，油气板块逆势爆发。成交额3.13万亿，放量1088亿，超4800只个股下跌，市场情绪极度低迷。</p>
+                    
+                    <p><strong>板块表现：</strong>油气、军工、黄金等避险板块领涨；芯片、新能源、消费等成长板块重挫。黄金股跟随国际金价回调，山东黄金跌超4%。北向资金净流出，人民币汇率在7.20附近震荡。</p>
+                    
+                    <div class="highlight">
+                        📌 <strong>国内关注点：</strong>两会政策细则落地、2月经济数据、美伊冲突对能源进口的影响、北向资金流向。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 跨市场联动关系 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">⚡ 跨市场联动关系</div>
+            </div>
+            <div class="card-body">
+                <div class="section-content">
+                    <p><strong>地缘冲突-能源-通胀链条：</strong>美伊冲突升级 → 油价暴涨 → 通胀预期回升 → 美联储降息推迟 → 高估值资产承压。这一链条当前主导全球风险资产定价。</p>
+                    
+                    <p><strong>美元指数-人民币联动：</strong>USD/CNH运行在7.20附近。美元指数跌破100关口至99.13，若美伊冲突推升避险情绪，美元可能反弹，人民币测试7.25-7.30区间。</p>
+                    
+                    <p><strong>油价-A股板块映射：</strong>布伦特突破84美元直接利好"三桶油"及油气服务板块；但对航空、化工等成本敏感板块构成压力。需关注冲突持续时间对油价的持续影响。</p>
+                    
+                    <p><strong>黄金-避险联动：</strong>黄金日内大跌4%，呈现"利好出尽"特征。但中期看，地缘不确定性仍支撑金价，5000美元（国内）为关键支撑，若守住则有望重拾升势。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 外汇市场 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">💱 外汇市场枢轴点</div>
+            </div>
+            <div class="card-body">
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>货币对</th>
+                                <th>现价</th>
+                                <th>R1</th>
+                                <th>PP</th>
+                                <th>S1</th>
+                                <th>策略</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>美元指数</strong></td>
+                                <td>99.13</td>
+                                <td>99.50</td>
+                                <td class="up">98.36</td>
+                                <td>97.50</td>
+                                <td><span class="tag tag-down">看空</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>USD/CNH</strong></td>
+                                <td>7.2050</td>
+                                <td>7.2500</td>
+                                <td class="up">7.1850</td>
+                                <td>7.1200</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>EUR/USD</strong></td>
+                                <td>1.0850</td>
+                                <td>1.0920</td>
+                                <td class="up">1.0800</td>
+                                <td>1.0750</td>
+                                <td><span class="tag tag-up">看多</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>GBP/USD</strong></td>
+                                <td>1.2650</td>
+                                <td>1.2720</td>
+                                <td class="up">1.2580</td>
+                                <td>1.2500</td>
+                                <td><span class="tag tag-up">看多</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>USD/JPY</strong></td>
+                                <td>149.50</td>
+                                <td>150.20</td>
+                                <td class="up">148.80</td>
+                                <td>148.00</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 大宗商品 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🛢️ 大宗商品枢轴点</div>
+            </div>
+            <div class="card-body">
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>商品</th>
+                                <th>现价</th>
+                                <th>R1</th>
+                                <th>PP</th>
+                                <th>S1</th>
+                                <th>策略</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>黄金(美元)</strong></td>
+                                <td>2850</td>
+                                <td class="up">2928</td>
+                                <td>2880</td>
+                                <td>2820</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>黄金(国内)</strong></td>
+                                <td>5100</td>
+                                <td class="up">5380</td>
+                                <td>5230</td>
+                                <td>4996</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>布伦特原油</strong></td>
+                                <td>84.20</td>
+                                <td class="up">86.50</td>
+                                <td>82.00</td>
+                                <td>80.00</td>
+                                <td><span class="tag tag-up">看多</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>WTI原油</strong></td>
+                                <td>77.50</td>
+                                <td class="up">80.00</td>
+                                <td>76.00</td>
+                                <td>74.00</td>
+                                <td><span class="tag tag-up">看多</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>铜</strong></td>
+                                <td>4.52</td>
+                                <td>4.65</td>
+                                <td class="up">4.45</td>
+                                <td>4.35</td>
+                                <td><span class="tag tag-down">看空</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 股票指数 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📈 股票指数枢轴点</div>
+            </div>
+            <div class="card-body">
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>指数</th>
+                                <th>现价</th>
+                                <th>R1</th>
+                                <th>PP</th>
+                                <th>S1</th>
+                                <th>策略</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>上证指数</strong></td>
+                                <td>4122.68</td>
+                                <td class="up">4200</td>
+                                <td>4150</td>
+                                <td>4050</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>深成指</strong></td>
+                                <td>14022.39</td>
+                                <td>14500</td>
+                                <td class="up">14200</td>
+                                <td>13800</td>
+                                <td><span class="tag tag-down">看空</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>创业板指</strong></td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td><span class="tag tag-down">看空</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>恒生指数</strong></td>
+                                <td>22850</td>
+                                <td>23200</td>
+                                <td class="up">22700</td>
+                                <td>22400</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>道琼斯</strong></td>
+                                <td>41320</td>
+                                <td>41800</td>
+                                <td class="up">41200</td>
+                                <td>40800</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>纳斯达克</strong></td>
+                                <td>22437</td>
+                                <td>22800</td>
+                                <td class="up">22500</td>
+                                <td>22000</td>
+                                <td><span class="tag tag-down">看空</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>标普500</strong></td>
+                                <td>5860</td>
+                                <td>5950</td>
+                                <td class="up">5880</td>
+                                <td>5800</td>
+                                <td><span class="tag tag-down">看空</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加密货币 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">₿ 加密货币枢轴点</div>
+            </div>
+            <div class="card-body">
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>币种</th>
+                                <th>现价</th>
+                                <th>R1</th>
+                                <th>PP</th>
+                                <th>S1</th>
+                                <th>策略</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>BTC/USD</strong></td>
+                                <td>88500</td>
+                                <td>92000</td>
+                                <td class="up">88000</td>
+                                <td>85000</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ETH/USD</strong></td>
+                                <td>2380</td>
+                                <td>2500</td>
+                                <td class="up">2350</td>
+                                <td>2250</td>
+                                <td><span class="tag tag-down">看空</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 热门个股 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🏢 热门个股枢轴点</div>
+            </div>
+            <div class="card-body">
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>股票</th>
+                                <th>现价</th>
+                                <th>R1</th>
+                                <th>PP</th>
+                                <th>S1</th>
+                                <th>策略</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>中石油</strong></td>
+                                <td>9.85</td>
+                                <td class="up">10.20</td>
+                                <td>9.60</td>
+                                <td>9.20</td>
+                                <td><span class="tag tag-up">看多</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>中石化</strong></td>
+                                <td>6.58</td>
+                                <td class="up">6.80</td>
+                                <td>6.40</td>
+                                <td>6.20</td>
+                                <td><span class="tag tag-up">看多</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>中海油</strong></td>
+                                <td>28.50</td>
+                                <td class="up">30.00</td>
+                                <td>27.50</td>
+                                <td>26.00</td>
+                                <td><span class="tag tag-up">看多</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>腾讯控股</strong></td>
+                                <td>485</td>
+                                <td>500</td>
+                                <td class="up">480</td>
+                                <td>465</td>
+                                <td><span class="tag tag-neutral">观望</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>阿里巴巴</strong></td>
+                                <td>135</td>
+                                <td>142</td>
+                                <td class="up">132</td>
+                                <td>128</td>
+                                <td><span class="tag tag-down">看空</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div style="text-align: center; padding: 24px; color: var(--text-secondary); font-size: 12px;">
+            <p>共和CIO · 枢轴点矩阵看板</p>
+            <p style="margin-top: 4px;">数据来源：AKShare / Finnhub / 新浪财经</p>
+            <p style="margin-top: 4px;">生成时间：2026-03-04 06:30 CST</p>
+        </div>
+    </div>
+</body>
+</html>
